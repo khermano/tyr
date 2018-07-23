@@ -31,22 +31,23 @@ public class TemplateChecker {
     }
 
     public void checkPR(JsonNode payload) {
-        StringJoiner joiner = new StringJoiner(", ");
+        //StringJoiner joiner = new StringJoiner(", ");
+        String description = "";
         for (Check check : checks) {
             String message = check.check(payload);
             if (message != null) {
-                joiner.add(message);
+                description = message;
             }
         }
 
         log.info("updating status");
-        String description = joiner.toString();
+        //String description = joiner.toString();
 
         GitHubAPI.updateCommitStatus(config.getRepository(),
                 payload.get(Utils.PULL_REQUEST).get(Utils.HEAD).get(Utils.SHA).asText(),
-                description.isEmpty() ? CommitStatus.SUCCESS : CommitStatus.ERROR,
+                description == "" ? CommitStatus.SUCCESS : CommitStatus.ERROR,
                 config.getStatusUrl(),
-                description.isEmpty() ? "valid" : description, "PR format check");
+                description == "" ? "valid" : description, "PR format check");
 
     }
 
